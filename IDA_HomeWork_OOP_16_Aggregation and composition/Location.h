@@ -186,5 +186,6 @@ public:
 
 	MotherPlant& operator [ ] (int index) { return *_plants_list[index]; }
 	iterator begin() { return _plants_list[0]; }
-	iterator end() { return _plants_list[_plants_list.size() - 1]; }
+	//iterator end() { return _plants_list[_plants_list.size() - 1]; }
+	iterator end() { return _plants_list[0] + _plants_list.size(); }
 };
