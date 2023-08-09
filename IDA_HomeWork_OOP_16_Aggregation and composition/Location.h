@@ -136,12 +136,13 @@ public:
 
 	class iterator
 	{
-		MotherPlant* _data_iterator;
+		//MotherPlant* _data_iterator; // так чот не очень работает
+		MotherPlant** _data_iterator; // в предположении, что в итераторе должен быть тип указателя на тип основного класса, в нашем случае получается MotherPlant**
 
 	public:
-		//iterator() = default; óêàçàíèå êîìïèëÿòîðó ñîçäàòü êîíñòðóêòîð  ïî óìîë÷àíèþ
+		//iterator() = default;
 		iterator() = delete;
-		iterator(MotherPlant* data) : _data_iterator(data) {}
+		iterator(MotherPlant** data) : _data_iterator(data) {}
 
 		iterator& operator++()
 		{
@@ -171,7 +172,8 @@ public:
 
 		MotherPlant& operator*()
 		{
-			return *_data_iterator;
+			//return *_data_iterator;
+			return **_data_iterator;
 		}
 		bool operator != (const iterator& obj)
 		{
@@ -183,9 +185,15 @@ public:
 		}
 
 	};
+	iterator begin() { return &_plants_list[0]; }
+	iterator end() { return &_plants_list[0] + _plants_list.size(); }
 
 	MotherPlant& operator [ ] (int index) { return *_plants_list[index]; }
-	iterator begin() { return _plants_list[0]; }
-	//iterator end() { return _plants_list[_plants_list.size() - 1]; }
-	iterator end() { return _plants_list[0] + _plants_list.size(); }
+	auto at(size_t index) const -> const MotherPlant&
+	{
+		return *_plants_list.at(index);
+	}
+	
+	
+
 };

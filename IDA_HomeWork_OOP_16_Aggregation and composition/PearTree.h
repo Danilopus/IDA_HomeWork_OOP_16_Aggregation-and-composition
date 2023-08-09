@@ -28,6 +28,7 @@ public:
 
 	size_t Get_fruits_remain() override { return _fruits_remain; }
 	std::string Get_Name() override { return _name_of_current_tree_class_; }
+	std::string Get_Name() const override { return _name_of_current_tree_class_; }
 
 
 	int Get_size() override { return int(_size); }

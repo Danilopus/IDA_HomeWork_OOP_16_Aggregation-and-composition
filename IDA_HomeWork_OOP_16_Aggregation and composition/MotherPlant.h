@@ -40,6 +40,8 @@ public:
 
 	virtual size_t Get_fruits_remain() = 0;
 	virtual std::string Get_Name() = 0;
+	virtual std::string Get_Name() const = 0;
+
 
 
 	friend std::ostream& operator << (std::ostream& out, const MotherPlant& MotherPlant_obj)

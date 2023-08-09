@@ -14,6 +14,8 @@ protected:
 	float _weight = 0; //kg
 	Color _color  = Color::black;
 public:
+	enum class fruitTypes { Apple, Raspberry, Pear, _end_of_enum_ }; //для целей учета сколько у нас всего классов фруктов
+
 	Fruit(std::string name, float weight, Color color) : _name(name), _weight(weight), _color(color) {}
 	//Fruit() = delete;
 	//Fruit() = default;

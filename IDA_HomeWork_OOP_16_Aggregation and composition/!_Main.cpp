@@ -52,38 +52,62 @@ void Task_1(std::string name_of_task)
 		system("cls");
 		std::cout << "***\t" << name_of_task << "\n";					
 	
-		//Функции фабрики выполняет класс TreeLocation через:
-		//  1. TreeLocation(int trees_number) - конструктор создания контейнера с рандомными деревьями
-		//	2. void Get_fruit(int tree_index, BackPack_Player_Interface* back_pack) - метод сбора плодов, связывающий Классы Fruit, MohterPlant и BackPack
-
-
 		//создаем локацию с от 30 до 100 рандомными деревьями		
-		TreeLocation Location_1;
-				
+		TreeLocation Location_1;				
 		
-		//Получим сводку по локации
+		//Получим категоризированную сводку по локации
 		std::cout << "\n--- Location_1.Info_categorized():\n";
 		Location_1.Info_categorized();
+		//Это  короткая сводка, вообще еще есть две по степени детализации:
+		//Location_1.Info(); // полная сводка по каждому дереву
+		//Location_1.ShowTrees(); // краткая сводка по каждому дереву
 						
 		
 		// Перебор деревьев
 
 		// Способ 1 - []
-		std::cout << "\n--- iterating through the elements []:\n";
+		std::cout << "\n\n--- iterating through the elements []:\n";
 		for (int i = 0; i < Location_1.size(); ++i)
 			std::cout << Location_1[i].Get_Name() << " | ";
 
 		// Способ 2 - iterator
-		std::cout << "\n--- iterating through the iterator:\n";
+		std::cout << "\n\n--- iterating through the iterator:\n";
 		for (auto iter = Location_1.begin(); iter != Location_1.end(); iter++)
 			std::cout << (*iter).Get_Name() << " | ";
+
+		// Способ 3 - at()
+		std::cout << "\n\n--- iterating through the at():\n";
+			for (int i = 0; i < Location_1.size(); ++i)
+				std::cout << Location_1.at(i).Get_Name() << " | ";
+
+		//Сбор всех плодов в рюкзак
+		std::cout << "\n\n\n--- Harvesting all fruits from all trees in location\n";
+		BackPack temp_back_pack;
+		for (auto iter = Location_1.begin(); iter != Location_1.end(); iter++)
+		//for (auto iter : Location_1)
+			while ((*iter).Get_fruits_remain())
+				temp_back_pack << *(*iter).Get_fruit();
 		
+		//Заглянем в рюкзак
+		std::cout << "\n\n--- temp_back_pack.ShortInfo():\n";
+		temp_back_pack.ShortInfo();
+		
+		//Осмотрим локацию
+		std::cout << "\n\n--- Location_1.Info_categorized():";
+		Location_1.Info_categorized();	
+			
+		//Удаление всех плодов одного типа
+		std::cout << "\n--- Delete all Pears:\n";
+		temp_back_pack.DeleteItem(Fruit::fruitTypes::Pear);
+				
+		std::cout << "\n\n--- ShortInfo():\n";
+		temp_back_pack.ShortInfo();
 
 		std::cout << "\n\nEsc - exit | any key to continue";
 	} while (_getch() != 27);
 }
 
-//Task 2 Base_Friut
+//Task 2 BackPack
 void Task_2(std::string name_of_task)
 
 {
@@ -91,80 +115,74 @@ void Task_2(std::string name_of_task)
 	{
 		system("cls");
 		std::cout << "***\t" << name_of_task << "\n";
-
-		
+				
 		BackPack main_back_pack;
-		TreeLocation Location_2(5);
-
-		std::cout << "\n--- Location_2.ShowTrees():";
-		Location_2.ShowTrees();
 		
+		//Создадим несколько деревьев, чтобы собрать с них фрукты в рюкзак
+		std::vector<MotherPlant*> trees_vec = { new AppleTree(2, Color::white, 50), new Raspberry_bush(1, Color::green, 70), new PearTree(2, Color::brown, 30) };
+		
+		//соберем в рюкзак по 5 разных фруктов
+		std::cout << "\n\n--- Harvesting 5 Apples, 5 Pears, 5 Raspberrys:\n";
+		for ( int tree = trees_vec.size(); tree; --tree)
+			for (int i = 0; i < 5; ++i)		
+				main_back_pack.AddItem(trees_vec[tree-1]->Get_fruit());
+						
+		// Еще есть такой вариант метода положить в рюкзак
+		Fruit& new_fruit = *new Apple(0.2, Color::green);
+		main_back_pack << new_fruit;
 
-		Base_MotherPlant* tree_ptr = &Location_2[0];
-		//Сорвем с Дерева 1 плод: 
-		Base_Fruit* base_fruit_ptr = tree_ptr->Get_fruit();
-		//опросим его методами класса Base_Fruit
-		std::cout << "\n\n--- Base_Fruit methods through class pointer";
-		std::cout << "\n\nName: " << base_fruit_ptr->Get_name();
-		std::cout << "\nweight: " << base_fruit_ptr->Get_weight();
-		std::cout << "\n color: " << base_fruit_ptr->Get_color();
-		//Уберем сорванный плод в рюкзак (используя dynamic_cast, потому что backpack хранит указатели Fruit* и не принимает указатель Base_Fruit*)
-		//main_back_pack.AddItem(base_fruit_ptr); // Error(active)	E0167	argument of type "Base_Fruit *" is incompatible with parameter of type "Fruit *"
-		Fruit* fruit_ptr = dynamic_cast<Fruit*>(base_fruit_ptr);
-		main_back_pack.AddItem(fruit_ptr);
-
-
-		//Переходим к сбору урожая
-		//соберем все плоды с дерева 1 и дерева 2 и 50 (или все) с дерева 3
-		std::cout << "\n\nTree 1 & Tree 2 full harvesting, Tree 3 - 100 fruit (or all) harvesting";
-
-		//Собираем все плоды с Деревьев 1 и 2. 
-		//Вообще в классе TreeLocation есть метод Get_fruit(tree_index, &back_pack) который выполняет сбор плодов и укладку в рюкзак
-		//но в целях демонстрации работы через виртуальные методы абстрактных базовых классов сделан этот код ниже:
-		int tree_index = 1;		
-		while (tree_index>=0)
+		std::cout << "\n\n--- ShortInfo():\n";
+		main_back_pack.ShortInfo();
+		//Перебор элементов Способ 1 []
+		std::cout << "\n\n--- iterating through the elements []:\n";
+		for (int i = 0; i < main_back_pack.size(); ++i)
 		{
-			tree_ptr = &Location_2[tree_index];
-			for (int i = 0; i < Location_2[tree_index].Get_max_fruits(); ++i)
-			{
-				base_fruit_ptr = tree_ptr->Get_fruit();
-				main_back_pack.AddItem(dynamic_cast<Fruit*>(base_fruit_ptr));
-			}
-			--tree_index;
+			//std::cout << "\nItem " << i + 1;
+			//main_back_pack[i]->Info();
+			std::cout << i + 1 <<":" << main_back_pack[i]->Get_name() <<" | ";
 		}
-		//Собираем 100 плодов с Дерева 3
-		tree_index = 2;
-			tree_ptr = &Location_2[tree_index];
-			for (int i = 0; i < 50; ++i)
-			{
-				base_fruit_ptr = tree_ptr->Get_fruit();
-				main_back_pack.AddItem(dynamic_cast<Fruit*>(base_fruit_ptr));
-			}
-		
-		//Осмотрим локацию после сбора урожая
-		std::cout << "\n\n--- Location_2.ShowTrees():";
-		Location_2.ShowTrees();
 
-		//Получим короткую сводку по рюкзаку
-		std::cout << "\n\n--- main_back_pack.ShortInfo():\n";
+		// удаление 1-го элемента
+		std::cout << "\n\n\n--- DeleteItem(1):\n";
+		main_back_pack.DeleteItem(1); 
+		
+		std::cout << "\n\n--- ShortInfo():\n";
+		main_back_pack.ShortInfo();
+		//Перебор элементов Способ 2 at()
+		std::cout << "\n\n--- iterating through the at():\n";
+		for (int i = 0; i < main_back_pack.size(); ++i)
+		{
+			//std::cout << "\nItem " << i + 1;
+			//main_back_pack.at(i).Info();
+			std::cout << i + 1 << ":" << main_back_pack.at(i).Get_name() << " | ";
+
+		}
+				
+		// удаление элементов в диапазоне
+		std::cout << "\n\n\n--- DeleteItem(3,5):\n";
+		main_back_pack.DeleteItem(3,5); 
+		
+		std::cout << "\n\n--- ShortInfo():\n";
+		main_back_pack.ShortInfo();
+		//Перебор элементов Способ 3 iterator
+		std::cout << "\n\n--- iterating through the iterator:\n";
+		int i=0;
+		for (auto iter : main_back_pack)			
+			std::cout << ++i << ":" << iter.Get_name() << " | ";
+
+
+		//Удаление всех плодов одного типа
+		std::cout << "\n\n\n--- Delete all Apples:\n";
+		main_back_pack.DeleteItem(Fruit::fruitTypes::Apple);
+
+		std::cout << "\n\n--- ShortInfo():\n";
 		main_back_pack.ShortInfo();
 
-		//Получим полную сводку по рюкзаку
-		std::cout << "\n\n\nGet ready to watch full BackPack info!";
+
+
+		std::cout << "\n\n\nGet ready to watch full BackPack info:";
 		_getch();
 		main_back_pack.Info();
-
-
-
-//Fruit fruit_obj("apple", 0.2, Color::red);
-//fruit_obj.Info();
-
-
-
-//Base_Fruit* fruit_obj_ptr = &fruit_obj;
-//fruit_obj_ptr->Get_name();
-
-
 
 		std::cout << "\n\nEsc - exit | any key to continue";
 	} while (_getch() != 27);
