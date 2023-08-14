@@ -74,6 +74,13 @@ void Task_1(std::string name_of_task)
 		std::cout << "\n\n--- iterating through the iterator:\n";
 		for (auto iter = Location_1.begin(); iter != Location_1.end(); iter++)
 			std::cout << (*iter).Get_Name() << " | ";
+		
+		// Способ 2.1 - for-each
+		std::cout << "\n\n--- iterating through the ranged-based for loop:\n";
+		//for (auto iter : Location_1)
+		for (auto& iter : Location_1)
+			std::cout << iter.Get_Name() << " | ";
+
 
 		// Способ 3 - at()
 		std::cout << "\n\n--- iterating through the at():\n";
@@ -83,10 +90,18 @@ void Task_1(std::string name_of_task)
 		//Сбор всех плодов в рюкзак
 		std::cout << "\n\n\n--- Harvesting all fruits from all trees in location\n";
 		BackPack temp_back_pack;
+		
 		for (auto iter = Location_1.begin(); iter != Location_1.end(); iter++)
-		//for (auto iter : Location_1)
 			while ((*iter).Get_fruits_remain())
 				temp_back_pack << *(*iter).Get_fruit();
+
+		// без ссылки не работает -> хочет экземпляры MotherPlant создавать, а он абстрактный
+		//* 
+		//for (auto iter : Location_1) 
+		for (auto& iter : Location_1) 
+		while (iter.Get_fruits_remain())
+			temp_back_pack << *(iter.Get_fruit());
+		//*/
 		
 		//Заглянем в рюкзак
 		std::cout << "\n\n--- temp_back_pack.ShortInfo():\n";
